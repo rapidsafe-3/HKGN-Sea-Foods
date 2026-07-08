@@ -1,0 +1,320 @@
+:root {
+    --premium-dark: #000000;
+    --premium-gold: #d4af37;
+    --bg-color: #f4f4f4;
+    --card-bg: #ffffff;
+    --text-main: #222222;
+    --border-color: #000000;
+    --danger-red: #cc0000;
+    --success-green: #15803d;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f5f5f7; 
+    color: var(--text-main);
+    margin: 0;
+    padding: 0; 
+    overflow-x: hidden;
+}
+
+/* Allow horizontal scroll if bill is wide */
+.app-screen {
+    display: none;
+    padding-bottom: 120px; 
+    overflow-y: auto;
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+}
+
+.app-screen.active {
+    display: block;
+}
+
+/* === APPLE STYLE BOTTOM NAVIGATION === */
+.apple-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85px; 
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+}
+
+.nav-item {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #8e8e93; 
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 70px;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.nav-icon {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 4px;
+    stroke: currentColor; 
+}
+
+.nav-item.active {
+    color: #000000; 
+}
+
+.nav-item:focus {
+    outline: none;
+}
+
+/* === SCROLLING & PADDING FIX === */
+.fade-screen {
+    padding: 20px;
+    padding-bottom: 140px !important; /* Adds space at the bottom so the nav bar doesn't hide bills */
+    display: none; 
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+    max-width: 600px; /* Keeps it centered nicely on bigger screens */
+    margin: 40px auto 0 auto;
+    
+    /* Enable smooth, native-feeling scrolling on iPhones/Androids */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; 
+}
+
+.item-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-top: 4px solid var(--premium-dark);
+    margin-bottom: 15px;
+    position: relative;
+    will-change: transform, opacity;
+    animation: swipeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+}
+
+.item-card.removing {
+    animation: swipeOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes swipeIn {
+    0% { transform: scale(0.95) translateX(20px); opacity: 0; }
+    100% { transform: scale(1) translateX(0); opacity: 1; }
+}
+
+@keyframes swipeOut {
+    0% { transform: scale(1) translateX(0); opacity: 1; }
+    100% { transform: scale(0.95) translateX(-20px); opacity: 0; }
+}
+
+.floating-back {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background-color: #ffffff;
+  color: black;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  z-index: 1000;
+  cursor: pointer;
+}
+
+#splash-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+    background-color: var(--premium-dark);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 9999; text-align: left; padding: 0 40px; box-sizing: border-box; transition: opacity 1s ease-out;
+}
+
+.apple-welcome-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 52px;
+    font-weight: 200; 
+    color: #ffffff;
+    line-height: 1.1;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: appleEntry 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes appleEntry {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.card { background: var(--card-bg); padding: 24px; border-radius: 20px; border: none; box-shadow: 0 8px 24px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02); margin-bottom: 20px; }
+.form-group { margin-bottom: 15px; margin-top: 10px; }
+label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: #86868b; text-transform: none; }
+select, input { width: 100%; padding: 16px; border: 1.5px solid #e5e5ea; border-radius: 12px; background-color: #fafafa; font-size: 17px; box-sizing: border-box; transition: all 0.2s ease; }
+select:focus, input:focus { outline: none; border-color: #000000; background-color: #ffffff; }
+
+.remove-btn { position: absolute; top: 10px; right: 15px; background-color: var(--danger-red); color: white; border: none; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; }
+
+.bill-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.bill-table th, .bill-table td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #eee; white-space: nowrap; }
+
+/* =========================================
+   CLEAN INVOICE UI (EXPANDABLE PAPER)
+========================================= */
+.receipt-paper {
+    background: white;
+    padding: 40px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    position: relative;
+    color: #000;
+    /* MAGIC FIX: This forces the paper to grow as wide as the table needs */
+    width: max-content; 
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.invoice-top { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+.invoice-left { flex:1; }
+.invoice-right { width:160px; text-align:right; }
+.invoice-left .inv-brand { font-size: 26px; font-weight: 900; margin: 0 0 5px 0; letter-spacing: 1px; color: #333; }
+.invoice-left .inv-tagline { font-weight: bold; margin: 0 0 15px 0; font-size: 14px; color: #555; }
+.invoice-left .inv-address, .invoice-left .inv-phone { margin: 2px 0; font-size: 12px; color: #333; }
+.invoice-right .inv-title { font-size: 28px; margin: 0 0 20px 0; letter-spacing: 2px; }
+.invoice-right p { margin: 5px 0; font-size: 13px; }
+
+.inv-client-box { border: 1px solid #000; border-radius: 6px; margin-bottom: 10px; font-size: 13px; overflow: hidden; }
+.inv-client-row { padding: 8px 10px; }
+
+/* FIXED: Prevent Main Items Table from squishing numbers */
+.inv-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.inv-items-table th, .inv-items-table td {
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap; /* Prevents text and numbers from breaking into two lines */
+}
+.inv-items-table th:last-child, .inv-items-table td:last-child { border-right: none; }
+.inv-items-table td:nth-child(2) { 
+    text-align: left; 
+    white-space: normal; /* Allows long fish names to wrap if necessary */
+    min-width: 120px;
+}
+.inv-total-label { border-top: 1px solid #000; text-align: right !important; font-weight: bold; padding-right: 15px !important; }
+.inv-total-amount { border-top: 1px solid #000; font-weight: bold; white-space: nowrap; }
+
+.inv-footer-box { border: 1px solid #000; border-top: none; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; font-size: 13px; }
+.inv-words { padding: 8px 10px; border-bottom: 1px solid #000; word-wrap: break-word; }
+.inv-terms { padding: 10px; }
+
+/* Modal Styling */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.modal-content { background: white; padding: 24px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modal-close-btn { position: absolute; top: 12px; right: 12px; background: #f5f5f7; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 22px; line-height: 22px; font-weight: 500; color: #86868b; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
+.modal-close-btn:active { background: #e5e5ea; }
+
+#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
+.toast { background: #333; color: #fff; padding: 14px 20px; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); font-size: 15px; font-weight: bold; text-align: center; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--success-green); }
+.toast.error { background: var(--danger-red); }
+
+.date-divider { font-size: 14px; font-weight: bold; color: #666; margin: 25px 0 10px 0; padding-bottom: 5px; border-bottom: 2px solid #ddd; text-transform: uppercase; }
+.history-card { background: #ffffff; border-radius: 20px; padding: 20px; margin-bottom: 16px; border-left: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: transform 0.2s ease, box-shadow 0.2s ease; border: 1px solid #e5e5ea; cursor: pointer; }
+.history-card:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.history-card strong { font-size: 17px; letter-spacing: -0.3px; color: #000000; }
+.history-arrow { color: #aaa; font-size: 20px; font-weight: bold; }
+
+.btn-primary, .btn-success, .btn-danger-outline, .btn-add-item { width: 100%; padding: 16px; font-size: 17px; font-weight: 600; text-transform: none; cursor: pointer; margin-top: 15px; border-radius: 14px; transition: transform 0.1s ease, opacity 0.2s ease; }
+.btn-primary:active, .btn-success:active, .btn-danger-outline:active, .btn-add-item:active { transform: scale(0.96); }
+.btn-primary { background-color: #000000; color: #ffffff; border: none; }
+.btn-primary:hover { opacity: 0.8; }
+.btn-success { background-color: var(--success-green); color: white; border: none; }
+.btn-danger-outline { background-color: transparent; color: var(--danger-red); border: 1.5px solid var(--danger-red); }
+.btn-add-item { background-color: #f5f5f7; color: #000000; border: 1.5px dashed #d2d2d7; }
+
+.premium-header { text-align: left; background-color: transparent; color: #1d1d1f; padding: 10px 5px 25px 5px; border-bottom: none; margin-bottom: 0; }
+.premium-header h2 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+.header-subtitle { color: #86868b; font-size: 15px; margin-top: 6px; font-weight: 500; }
+
+/* === BULLETPROOF PRINT SETTINGS === */
+@media print {
+    /* 1. Hide absolutely everything on the screen */
+    body * {
+        visibility: hidden;
+    }
+
+    /* 2. Show ONLY the receipt paper and its contents */
+    #receiptPaper, #receiptPaper *,
+    #historyReceiptPaper, #historyReceiptPaper * {
+        visibility: visible;
+    }
+
+    /* 3. Pull the receipt to the absolute top-left of the paper */
+    #receiptPaper, #historyReceiptPaper {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important; /* Expand to fill paper */
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important; /* The @page margin handles the spacing */
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+    }
+
+    /* 4. Lock the header so it doesn't break into two lines */
+    .invoice-top {
+        display: flex !important;
+        flex-direction: row !important; /* Forces side-by-side */
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+    }
+    .invoice-left { width: 60% !important; text-align: left !important; }
+    .invoice-right { width: 35% !important; text-align: right !important; }
+
+    /* 5. Force the table to span full width cleanly */
+    .inv-items-table {
+        width: 100% !important;
+        table-layout: auto !important;
+    }
+    
+    .inv-items-table th, .inv-items-table td {
+        white-space: nowrap !important;
+        padding: 8px 4px !important;
+    }
+
+    /* 6. Define exact A5 Paper size */
+    @page {
+        size: A5 portrait;
+        margin: 10mm; /* Creates a clean white border around the printout */
+    }
+}
