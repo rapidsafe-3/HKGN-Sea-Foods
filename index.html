@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKGN Sea Food N A S - Premium Billing</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <button id="backBtn" class="floating-back" onclick="goBack()" style="display: none;">
+        &#8592;
+    </button>
+
+  <div id="app-container">
+    
+    <div id="splash-screen">
+        <div class="apple-style-container">
+            <h1 class="apple-welcome-text">Welcome,<br>Nawaz Ahmed</h1>
+        </div>
+    </div>
+
+    <!-- HOME / DASHBOARD SCREEN -->
+    <div id="customer-screen" class="fade-screen">
+        <div class="premium-header">
+            <h2>New Invoice Details</h2>
+        </div>
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="form-group">
+                <label for="customerName">Client Name *</label>
+                <input type="text" id="customerName" placeholder="Enter client's name..." required>
+            </div>
+            <button class="btn-primary" onclick="startBilling()">Initiate Billing</button>
+        </div>
+
+        <!-- NEW: PENDING PAYMENTS DASHBOARD -->
+        <div class="premium-header" style="padding-top: 0;">
+            <h2 style="font-size: 24px; color: #ff3b30;">Pending Payments</h2>
+        </div>
+        <div id="dashboard-unpaid-list">
+            <!-- Unpaid bills will load here automatically -->
+        </div>
+    </div> 
+
+    <!-- MAIN APP / BILLING SCREEN -->
+    <div id="main-app" class="fade-screen">
+        <div class="premium-header">
+            <h2>HKGN Sea Food N A S</h2>
+        </div>
+        
+        <div class="customer-info card">
+            <h3 id="displayCustomerName" style="margin: 0;">Client: </h3>
+        </div>
+
+        <div id="items-container"></div>
+
+        <button class="btn-add-item" onclick="addNewItemRow()">+ ADD ANOTHER ITEM</button>
+
+        <div class="card summary-card">
+            <h3 class="section-title">Live Summary</h3>
+            <!-- Wrapper added to allow horizontal scrolling on live summary if needed -->
+            <div style="overflow-x: auto;">
+                <table class="bill-table" id="billTable">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Kg</th>
+                            <th>Rate</th>
+                            <th>Bal</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billBody"></tbody>
+                </table>
+                
+                <table class="bill-table">
+                    <tr class="total-row">
+                        <td colspan="4">Grand Total:</td>
+                        <td id="grandTotal">₹0.00</td>
+                    </tr>
+                </table>
+            </div>
+            <button class="btn-primary" onclick="saveBill()" style="margin-bottom: 10px; margin-top: 15px;">💾 SAVE BILL TO CLOUD</button>
+            <button class="btn-success" onclick="generateBill()">GENERATE BILL</button>
+        </div>
+    </div>
+
+    <!-- NEW BILL RECEIPT SCREEN -->
+    <div id="receipt-screen" class="fade-screen">
+        <div class="receipt-paper" id="receiptPaper">
+            <div class="invoice-top">
+                <div class="invoice-left">
+                    <h1 class="inv-brand">HKGN Sea Food<br>N A S</h1>
+                    <p class="inv-tagline">Premium Wholesale Distributor</p>
+                    <p class="inv-address">Meenakshi Koil Street L, No 3<br>Near New Market,<br>Shivajinagar Bangalore - 51</p>
+                    <p class="inv-phone"><strong>98868 34049</strong></p>
+                </div>
+                <div class="invoice-right">
+                    <h2 class="inv-title">INVOICE</h2>
+                    <p><strong>Invoice Date :</strong> <span id="invDate"></span></p>
+                </div>
+            </div>
+
+            <div class="inv-client-box">
+                <div class="inv-client-row">
+                    <strong>Name:</strong> <span id="recName"></span>
+                </div>
+            </div>
+
+            <table class="inv-items-table">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Description</th>
+                        <th>Qty.</th>
+                        <th>Rate</th>
+                        <th>Balance</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptBody"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="inv-total-label">Total</td>
+                        <td class="inv-total-amount" id="receiptGrandTotal">₹0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="inv-footer-box">
+                <div class="inv-words">
+                    <strong>Rupees In Words : </strong><span id="rupeesInWords"></span>
+                </div>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="saveBill()" style="margin-bottom: 10px;">💾 SAVE BILL TO CLOUD</button>     
+        <button class="btn-success" id="shareBtn" onclick="shareBill('receiptPaper', 'shareBtn')">🔗 SHARE AS IMAGE</button>
+        <button class="btn-primary" style="background: #007AFF;" onclick="printReceipt('receiptPaper')">🖨️ PRINT RECEIPT</button>
+        <button class="btn-danger-outline" onclick="startNewFromReceipt()">START NEW BILL</button>
+    </div>
+
+    <!-- UNSAVED WARNING MODAL -->
+    <div id="unsaved-warning" class="modal" style="display: none;">
+        <div class="modal-content" style="position: relative;">
+            <button class="modal-close-btn" onclick="cancelLeave()">×</button>
+            <h3>Unsaved Changes</h3>
+            <p>You have an unsaved bill. Do you want to save it before leaving?</p>
+            <button class="btn-success" onclick="saveBill()">Save & Leave</button>
+            <button class="btn-danger-outline" onclick="discardAndLeave()">Don't Save</button>
+        </div>
+    </div>
+  
+    <!-- HISTORY RECEIPT SCREEN -->
+    <div id="history-receipt-screen" class="app-screen fade-screen">
+        <div class="receipt-paper" id="historyReceiptPaper">
+            <!-- PAYMENT STATUS BADGE FOR PRINTING -->
+            <div id="history-print-status" style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 10px; border: 2px solid; padding: 5px; border-radius: 8px;"></div>
+
+            <div class="invoice-top">
+                <div class="invoice-left">
+                    <h1 class="inv-brand">HKGN Sea Food<br>N A S</h1>
+                    <p class="inv-tagline">Premium Wholesale Distributor</p>
+                    <p class="inv-address">Meenakshi Koil Street L, No 3<br>Near New Market,<br>Shivajinagar Bangalore - 51</p>
+                    <p class="inv-phone"><strong>98868 34049</strong></p>
+                </div>
+                <div class="invoice-right">
+                    <h2 class="inv-title">INVOICE</h2>
+                    <p><strong>Invoice Date :</strong> <span id="history-invDate"></span></p>
+                </div>
+            </div>
+
+            <div class="inv-client-box">
+                <div class="inv-client-row">
+                    <strong>Name:</strong> <span id="history-recName"></span>
+                </div>
+            </div>
+
+            <table class="inv-items-table">
+                <thead>
+                    <tr>
+                        <th>Sl.No.</th>
+                        <th>Description</th>
+                        <th>Qty.</th>
+                        <th>Rate</th>
+                        <th>Balance</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="history-receiptBody"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="inv-total-label">Total</td>
+                        <td class="inv-total-amount" id="history-receiptGrandTotal">₹0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="inv-footer-box">
+                <div class="inv-words">
+                    <strong>Rupees In Words : </strong><span id="history-rupeesInWords"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: PAYMENT STATUS BUTTONS -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;" id="payment-btn-container">
+            <!-- Populated via JS -->
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn-primary" id="historyEditBtn" style="flex: 1; margin-top: 0;">✏️ EDIT BILL</button>
+            <button class="btn-danger-outline" id="historyDeleteBtn" style="flex: 1; margin-top: 0; background: white;">🗑️ DELETE</button>
+        </div>
+        <button class="btn-success" id="historyShareBtn" onclick="shareBill('historyReceiptPaper', 'historyShareBtn')">🔗 SHARE AS IMAGE</button>
+        <button class="btn-primary" style="background: #007AFF;" onclick="printReceipt('historyReceiptPaper')">🖨️ PRINT RECEIPT</button>
+    </div>
+  
+    <!-- HISTORY LIST SCREEN -->
+    <div id="history-screen" class="fade-screen">
+        <div class="premium-header"><h2>Bill History</h2></div>
+        <div class="card">
+            <input type="text" id="searchName" placeholder="Search by name..." oninput="filterHistory()">
+            <label style="margin-top:15px; font-size:12px; color:#86868b; display:block;">Filter by Date</label>
+            <input type="date" id="searchDate" onchange="filterHistory()">
+        </div>
+        <div id="history-list"></div> 
+    </div> 
+
+    <!-- PROFILE SCREEN -->
+    <div id="profile-screen" class="fade-screen">
+        <div class="premium-header"><h2>Profile</h2></div>
+        <div class="card">
+            <p><strong>Store:</strong> HKGN Sea Food N A S</p>
+            <p><strong>Owner:</strong> Nawaz Ahmed</p>
+            <button class="btn-danger-outline" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+  </div> <!-- End of app-container -->
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- APPLE BOTTOM NAV -->
+  <nav id="bottom-nav" class="apple-bottom-nav" style="display: none;">
+      <button id="nav-home" class="nav-item active" onclick="switchScreen('customer-screen')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Home</span>
+      </button>
+
+      <button id="nav-history" class="nav-item" onclick="switchScreen('history-screen')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>History</span>
+      </button>
+
+      <button id="nav-profile" class="nav-item" onclick="switchScreen('profile-screen')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Profile</span>
+      </button>
+  </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
